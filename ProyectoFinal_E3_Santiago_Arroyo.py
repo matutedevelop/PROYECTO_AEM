@@ -399,19 +399,19 @@ def _(cmap, df_train):
 
 @app.cell
 def _(crosstab_viz):
-    crosstab_viz("agent","company")
+    crosstab_viz("agent", "company")
     return
 
 
 @app.cell
 def _(crosstab_viz):
-    crosstab_viz("reserved_room_type","assigned_room_type")
+    crosstab_viz("reserved_room_type", "assigned_room_type")
     return
 
 
 @app.cell
 def _(crosstab_viz):
-    crosstab_viz("distribution_channel","market_segment")
+    crosstab_viz("distribution_channel", "market_segment")
     return
 
 
