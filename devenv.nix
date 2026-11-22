@@ -1,0 +1,54 @@
+{ pkgs, lib, config, inputs, ... }:
+
+{
+  # https://devenv.sh/basics/
+  env.GREET = "Proyecto AEM";
+
+  # https://devenv.sh/packages/
+  packages = [
+    pkgs.git
+    pkgs.zlib
+  ];
+
+  # https://devenv.sh/languages/
+  languages.python = {
+    enable = true;
+    directory = "./";
+    version = "3.13";
+    venv = {
+      enable = true;
+    };
+    uv = {
+      enable = true;
+      sync.enable = true;
+      sync.allGroups = true;
+    };
+  };
+
+
+
+
+  # === === === === === === ===
+
+  env.LD_LIBRARY_PATH = lib.makeLibraryPath [
+    pkgs.zlib
+    pkgs.stdenv.cc.cc.lib
+
+  ] + ":/run/opengl-driver/lib";
+
+  # === === === === === === ===
+
+
+
+  # https://devenv.sh/scripts/
+  scripts.hello.exec = ''
+    echo ==== $GREET ====
+  '';
+
+  # https://devenv.sh/basics/
+  enterShell = ''
+    hello         # Run scripts directly
+    git --version # Use packages
+  '';
+}
+
