@@ -3,3 +3,4 @@ data/
 .devenv/
 __marimo__/
 custom.css
+__pycache__
