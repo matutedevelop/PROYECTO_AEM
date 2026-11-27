@@ -1,11 +1,7 @@
 import marimo
 
 __generated_with = "0.25.2"
-app = marimo.App(
-    width="medium",
-    layout_file="layouts/ProyectoFinal_E3_Santiago_Arroyo.slides.json",
-    css_file="custom.css",
-)
+app = marimo.App(width="medium", css_file="custom.css")
 
 with app.setup:
     import sys
@@ -34,7 +30,7 @@ with app.setup:
     from sklearn.preprocessing import StandardScaler
     from hastyplot import qplot
 
-    SEED = 42  # semilla requerida por el proyecto (random_state = 42)
+    SEED = 42
 
 
 @app.cell
@@ -669,7 +665,7 @@ def _(correlation_tests):
 
     _chart
     mo.hstack([_df, _chart])
-    return
+    return (pearson_coefs,)
 
 
 @app.cell
@@ -1097,7 +1093,7 @@ def _(df_sample):
 
     df_model = prepare_model_data(df_sample)
     df_model.describe().T.round(3)
-    return df_model, prepare_model_data
+    return (df_model,)
 
 
 @app.cell(hide_code=True)
@@ -1228,19 +1224,20 @@ def _(logit_full, logit_reduced):
     ).round(3)
 
     lrt_full_vs_reduced = {"chi2": _lr, "gl": _df_diff, "p_value": _p}
-    mo.vstack(
-        [
-            model_comparison,
-            mo.md(
-                rf"""
-    **Prueba de razon de verosimilitudes (completo vs reducido)**
-    $H_0$: los coeficientes de las {_df_diff} variables eliminadas son todos cero.
+    model_comparison
+    return (lrt_full_vs_reduced,)
 
-    $G^2 = 2(\ell_{{completo}} - \ell_{{reducido}}) = {_lr:.3f}$, $gl = {_df_diff}$, $p = {_p:.4f}$
-    """
-            ),
-        ]
-    )
+
+@app.cell(hide_code=True)
+def _(lrt_full_vs_reduced):
+    _r = lrt_full_vs_reduced
+    mo.md(rf"""
+    **Prueba de razon de verosimilitudes (completo vs reducido)**
+
+    $H_0$: los coeficientes de las {_r["gl"]} variables eliminadas son todos cero.
+
+    $G^2 = 2(\ell_{{completo}} - \ell_{{reducido}}) = {_r["chi2"]:.3f}$, $gl = {_r["gl"]}$, $p = {_r["p_value"]:.4f}$
+    """)
     return
 
 
@@ -1307,7 +1304,7 @@ def _():
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(PREDICTORS_FINAL, logit_final):
     _b = logit_final.params
     _names = {
@@ -1321,6 +1318,7 @@ def _(PREDICTORS_FINAL, logit_final):
         f"{'+' if _b[p] >= 0 else '-'} {abs(_b[p]):.3f}\\,{_names[p]}"
         for p in PREDICTORS_FINAL
     )
+
     mo.md(
         rf"""
     ### Especificacion del modelo ajustado
@@ -1335,10 +1333,9 @@ def _(PREDICTORS_FINAL, logit_final):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(logit_final):
-    mo.md(
-        rf"""
+    mo.md(rf"""
     ### Significancia global
 
     Prueba de razon de verosimilitudes frente al modelo nulo (solo intercepto):
@@ -1349,8 +1346,7 @@ def _(logit_final):
     | {logit_final.llr:.3f} | {int(logit_final.df_model)} | {logit_final.llr_pvalue:.2e} | {-2 * logit_final.llnull:.3f} | {-2 * logit_final.llf:.3f} | {logit_final.prsquared:.3f} |
 
     Se rechaza $H_0$ contundentemente ($p \approx 10^{{-23}}$): **al menos una** de las variables del modelo esta asociada con la probabilidad de cancelacion. El modelo reduce la devianza en {logit_final.llr:.1f} unidades usando solo 5 grados de libertad. Un pseudo-$R^2$ de {logit_final.prsquared:.2f} se considera un ajuste aceptable en regresion logistica (valores de 0.2 a 0.4 suelen indicar un buen ajuste en la escala de McFadden).
-    """
-    )
+    """)
     return
 
 
@@ -2324,7 +2320,6 @@ def _(df_sample):
         N_PC_80,
         N_PC_KAISER,
         PC_NAMES,
-        build_pca_matrix,
         pca_input,
         pca_model,
         pca_scaler,
@@ -2430,7 +2425,7 @@ def _(N_PC_KAISER, PC_NAMES, cmap, pca_input, pca_model):
     _axes[1].set_xlabel("carga (correlacion con el componente)")
     plt.tight_layout()
     _fig
-    return (pca_loadings,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -2558,7 +2553,7 @@ def _(
             pca_comparison.round(4),
         ]
     )
-    return PCS_KAISER, df_pca, logit_pca, pca_comparison
+    return
 
 
 @app.cell(hide_code=True)
